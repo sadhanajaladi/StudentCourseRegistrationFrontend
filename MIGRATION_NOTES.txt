@@ -1,0 +1,27 @@
+React-to-Dojo migration notes
+
+This frontend uses Dojo Toolkit 1.17.3 with AMD modules loaded from the Dojo CDN.
+No React, React DOM, React Router, Vite, or npm runtime dependencies are required.
+
+Architecture:
+- index.html: one application mount div only.
+- main.js: the only application entry point; it starts app/App.
+- app/App.js: application controller, routing, API orchestration, and event handling.
+- app/widgets/: separate UI modules for Login, Signup, Navbar, StudentDashboard,
+  AdminDashboard, and CourseCard.
+- app/services/Api.js: shared fetch wrapper with JWT bearer-token support.
+- app/config.js: backend API base URL.
+- app/styles/app.css: application styles.
+
+Run locally from this folder:
+  python -m http.server 5500
+Then open http://localhost:5500
+
+Before deployment, update app/config.js with the deployed Spring Boot API URL and
+configure backend CORS to allow the deployed frontend origin.
+
+This conversion covers the React frontend features present in the supplied ZIP:
+login, signup, student dashboard, course search/details/enrollment, student profile,
+admin student management, enrollment management, and course creation.
+Document upload/versioning/check-in-check-out/annotation screens were not present
+in the supplied React source and are not included in this conversion.

@@ -1,0 +1,9 @@
+{
+  "name": "student-registration-dojo-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Dojo Toolkit frontend for Student Course Registration System",
+  "scripts": {
+    "serve": "python -m http.server 5500"
+  }
+}
