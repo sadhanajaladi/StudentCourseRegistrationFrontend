@@ -1,0 +1,76 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Student Course Registration System</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet"
+          href="./vendor/bootstrap/css/bootstrap.min.css">
+
+    <!-- Dijit Claro -->
+    <link rel="stylesheet"
+          href="./vendor/dijit/themes/claro/claro.css">
+
+    <!-- DojoX Grid -->
+    <link rel="stylesheet"
+          href="./vendor/dojox/grid/resources/Grid.css">
+
+    <link rel="stylesheet"
+          href="./vendor/dojox/grid/resources/claroGrid.css">
+
+    <link rel="stylesheet" href="./app/styles/app.css">
+
+    <!-- Dojo configuration: only once -->
+    <script>
+        var dojoConfig = {
+            async: true,
+            parseOnLoad: false,
+            baseUrl: "./vendor/",
+            packages: [
+                { name: "dojo", location: "dojo" },
+                { name: "dijit", location: "dijit" },
+                { name: "dojox", location: "dojox" },
+                { name: "app", location: "../app" }
+            ]
+        };
+    </script>
+
+    <!-- Load PDF.js first -->
+<script src="./vendor/pdfjs/pdf.min.js"></script>
+
+<!-- Load Bootstrap before Dojo -->
+<script src="./vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+<!-- Configure Dojo before loading Dojo -->
+<script>
+var dojoConfig = {
+    async: true,
+    parseOnLoad: false,
+    baseUrl: "./vendor/",
+    packages: [
+        { name: "dojo", location: "dojo" },
+        { name: "dijit", location: "dijit" },
+        { name: "dojox", location: "dojox" },
+        { name: "app", location: "../app" }
+    ]
+};
+</script>
+
+<!-- Load Dojo -->
+<script src="./vendor/dojo/dojo.js"></script>
+
+<!-- Start application -->
+<script src="./main.js"></script>
+
+</head>
+
+<body class="claro">
+
+    <main id="app" class="container-fluid min-vh-100"></main>
+
+</body>
+</html>

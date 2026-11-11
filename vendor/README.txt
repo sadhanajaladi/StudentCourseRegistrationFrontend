@@ -1,0 +1,1 @@
+Run npm install in the frontend folder to populate this directory with local Dojo, Dijit, DojoX, Bootstrap and PDF.js distributions. Commit the populated vendor directory for fully offline deployment.
