@@ -1,19 +1,37 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Student Course Registration System</title>
+<link rel="icon" href="data:,">
+  <!-- Your custom CSS -->
   <link rel="stylesheet" href="app/styles/app.css">
+
+  <!-- Dojo configuration -->
   <script>
     var dojoConfig = {
       async: true,
       parseOnLoad: false,
-      packages: [{ name: "app", location: location.pathname.replace(/[^/]*$/, "app") }]
+      packages: [
+        {
+          name: "app",
+          location: location.pathname.replace(/[^/]*$/, "app")
+        }
+      ]
     };
   </script>
+
+  <!-- PDF.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+  <!-- Dojo -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dojo/1.17.3/dojo.js"></script>
+
+  <!-- Bootstrap JavaScript -->
+
+  <!-- Application entry point -->
   <script src="main.js"></script>
 </head>
 <body>

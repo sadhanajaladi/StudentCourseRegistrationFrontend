@@ -12,12 +12,13 @@ define([
     "app/widgets/AdminDashboard",
     "app/widgets/CourseCard",
     "app/widgets/DocumentUpload",
-    "app/widgets/DocumentManagement"
+    "app/widgets/DocumentManagement",
+    "app/widgets/AdminDocumentViewer"
 ], function (
     dom, domConstruct, on, api, AuthController,
     LoginWidget, SignupWidget, NavbarWidget,
     StudentDashboardWidget, AdminDashboardWidget,
-    CourseCardWidget, DocumentUploadWidget, DocumentManagementWidget
+    CourseCardWidget, DocumentUploadWidget, DocumentManagementWidget,AdminDocumentViewerWidget
 ) {
     function esc(v) {
         return String(v == null ? "" : v).replace(/[&<>"']/g, function (c) {
@@ -667,18 +668,17 @@ App.prototype.renderMyEnrollments = function () {
     // ADMIN DOCUMENTS
 
     App.prototype.loadDocuments = function () {
-        var host = dom.byId("adminContent");
-        if (!host) return;
 
-        host.innerHTML = "";
-        var widget = new DocumentUploadWidget();
+    var host = dom.byId("adminContent");
 
-        widget.onUploadSuccess = function (response) {
-            console.log("Uploaded document:", response);
-        };
+    if (!host) return;
 
-        widget.placeAt(host);
-    };
+    host.innerHTML = "";
+
+    var widget = new AdminDocumentViewerWidget();
+
+    widget.placeAt(host);
+};
 
     return App;
 });

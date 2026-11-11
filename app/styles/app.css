@@ -509,3 +509,51 @@ th {
         overflow-x: auto;
     }
 }
+
+.admin-document-viewer {
+    padding: 20px;
+}
+
+.admin-document-viewer input {
+    width: 100%;
+    max-width: 450px;
+    padding: 10px;
+    margin: 8px 0 15px;
+    box-sizing: border-box;
+}
+
+.admin-document-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 15px 0;
+}
+
+.admin-document-card button,
+.admin-document-version button {
+    padding: 8px 14px;
+    margin: 6px;
+    cursor: pointer;
+}
+
+.admin-document-version {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    border-top: 1px solid #eee;
+    padding: 10px 0;
+}
+
+#studentSearchResults button {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    text-align: left;
+    width: 100%;
+    max-width: 450px;
+}
+
+#studentSearchResults button:hover {
+    background: #f2f5f9;
+}
