@@ -4,7 +4,7 @@ define([
     "dojo/on",
     "dojo/store/Memory",
     "dojo/data/ObjectStore",
-    "dojox/grid/DataGrid",
+    "dojox/grid/EnhancedGrid",
     "dijit/form/ValidationTextBox",
     "dijit/form/Select",
     "dijit/form/Button",
@@ -14,7 +14,7 @@ define([
     "app/services/Api",
     "app/services/Logger",
     "app/services/Properties"
-], function (declare, domConstruct, on, Memory, ObjectStore, DataGrid, ValidationTextBox, Select, Button, PdfAnnotationViewer, ConfirmDialog, DocumentManagementController,api, Logger, Properties) {
+], function (declare, domConstruct, on, Memory, ObjectStore, EnhancedGrid, ValidationTextBox, Select, Button, PdfAnnotationViewer, ConfirmDialog, DocumentManagementController,api, Logger, Properties) {
 
     return declare(null, {
         constructor: function () {
@@ -163,7 +163,7 @@ define([
                     var store = new Memory({ data: rows, idProperty: "id" });
                     if (self.grid && !self.grid._destroyed) self.grid.destroy();
 
-                    self.grid = new DataGrid({
+                    self.grid = new EnhancedGrid({
                         store: new ObjectStore({ objectStore: store }),
                         structure: [[
                             { name: "ID", field: "id", width: "10%" },

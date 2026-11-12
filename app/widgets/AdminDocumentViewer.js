@@ -1,21 +1,22 @@
 define([
     "dojo/dom-construct",
     "dojo/on",
-    "dojo/store/Memory",
-    "dojo/data/ObjectStore",
-    "dojox/grid/DataGrid",
+    "app/services/AdminUi",
     "dijit/form/TextBox",
     "dijit/form/Button",
     "app/widgets/PdfAnnotationViewer",
     "app/services/Api",
     "app/services/Logger",
     "app/services/Properties"
-], function (domConstruct, on, Memory, ObjectStore, DataGrid, TextBox, Button, PdfAnnotationViewer, api, Logger, Properties) {
+], function (domConstruct, on, AdminUi, TextBox, Button, PdfAnnotationViewer, api, Logger, Properties) {
 
-    function AdminDocumentViewer() {
+function AdminDocumentViewer() {
         this.students = [];
         this.documents = [];
-        this.grids = [];
+        this.selectedDocuments = [];
+        this.studentGrid = null;
+        this.documentGrid = null;
+        this.annotationGrid = null;
         this.pdfViewer = new PdfAnnotationViewer();
     }
 
@@ -24,22 +25,23 @@ define([
         parent.innerHTML = [
             '<div class="container-fluid px-0">',
             '<div class="card shadow-sm border-0 mb-4">',
-            '<div class="card-header bg-white py-3 border-bottom">',
-            '<h5 class="card-title fw-bold text-primary mb-0">Search Student Documents & Annotations</h5>',
-            '</div>',
+            '<div class="card-header bg-white py-3 border-bottom"><h5 class="card-title fw-bold text-primary mb-0">👥 Students</h5></div>',
             '<div class="card-body">',
-            '<div class="row g-3 align-items-center mb-3">',
-            '<div class="col-md-5">',
-            '<label class="form-label fw-semibold text-secondary" for="adminStudentSearch">Filter by Student Name or Email</label>',
+            '<div class="dashboard-search-panel mb-3">',
+            '<label class="form-label fw-semibold text-secondary mb-2" for="adminStudentSearch">🔍 Search students</label>',
             '<div id="adminStudentSearchSlot"></div>',
             '</div>',
-            '<div class="col-md-7">',
-            '<label class="form-label fw-semibold text-secondary">Matching Students (Select to view documents)</label>',
-            '<div id="studentGridSlot" style="height: 160px; width: 100%;"></div>',
+            '<div id="studentGridSlot" class="admin-document-grid"></div>',
             '</div></div>',
+            '<div class="card shadow-sm border-0 mb-4">',
+            '<div class="card-header bg-white py-3 border-bottom"><h5 class="card-title fw-bold text-primary mb-0">📄 Student Documents</h5></div>',
+            '<div class="card-body">',
             '<div id="selectedStudentBanner" class="alert alert-primary d-none py-2 px-3 fw-semibold"></div>',
-            '<h6 class="fw-bold text-dark mt-4 mb-2">Student Documents</h6>',
-            '<div id="documentGridSlot" style="height: 180px; width: 100%;"></div>',
+            '<div class="dashboard-search-panel mb-3">',
+            '<label class="form-label fw-semibold text-secondary mb-2" for="adminDocumentSearch">🔍 Search documents</label>',
+            '<div id="adminDocumentSearchSlot"></div>',
+            '</div>',
+            '<div id="documentGridSlot" class="admin-document-grid"><div class="alert alert-light border mb-0">Select a student above to view their documents.</div></div>',
             '<div id="documentDetailsArea" class="mt-4"></div>',
             '</div></div></div>'
         ].join("");
@@ -50,8 +52,18 @@ define([
             intermediateChanges: true,
             trim: true,
             style: "width: 100%;"
-        }, domConstruct.create("input", {}, searchHost));
+        }, domConstruct.create("input", { id: "adminStudentSearch", "aria-label": "Search students by name or email" }, searchHost));
         this.searchWidget.startup();
+
+        var documentSearchHost = parent.querySelector("#adminDocumentSearchSlot");
+        this.documentSearchWidget = new TextBox({
+            placeHolder: "Search document title, type, or version...",
+            intermediateChanges: true,
+            trim: true,
+            disabled: true,
+            style: "width: 100%;"
+        }, domConstruct.create("input", { id: "adminDocumentSearch", "aria-label": "Search documents by title, type, or version" }, documentSearchHost));
+        this.documentSearchWidget.startup();
 
         this.banner = parent.querySelector("#selectedStudentBanner");
         this.detailsArea = parent.querySelector("#documentDetailsArea");
@@ -59,6 +71,9 @@ define([
         var self = this;
         on(this.searchWidget, "change", function (val) {
             self.filterStudents(val);
+        });
+        on(this.documentSearchWidget, "change", function (val) {
+            self.filterDocuments(val);
         });
 
         this.loadInitialData();
@@ -87,28 +102,26 @@ define([
             return (String(s.name || "") + " " + String(s.email || "")).toLowerCase().indexOf(query) >= 0;
         });
 
-        var store = new Memory({ data: matches, idProperty: "id" });
         var slot = this.parent.querySelector("#studentGridSlot");
+        if (this.studentGrid && !this.studentGrid._destroyed) {
+            this.studentGrid.destroyRecursive();
+        }
+        this.studentGrid = null;
         slot.innerHTML = "";
+        slot.style.height = "auto";
 
         if (!matches.length) {
             slot.innerHTML = '<div class="alert alert-light border py-2">No matching students found.</div>';
             return;
         }
 
-        var grid = new DataGrid({
-            store: new ObjectStore({ objectStore: store }),
-            structure: [[
+        var grid = AdminUi.createGrid(slot, matches, [[
                 { name: "ID", field: "id", width: "15%" },
                 { name: "Student Name", field: "name", width: "40%" },
                 { name: "Email Address", field: "email", width: "45%" }
-            ]],
-            autoHeight: true,
-            selectionMode: "single"
-        }, domConstruct.create("div", { style: "height: 150px; width: 100%;" }, slot));
+            ]], { autoHeight: 5, selectionMode: "single" });
 
-        grid.startup();
-        this.grids.push(grid);
+        this.studentGrid = grid;
 
         on(grid, "RowClick", function (evt) {
             var item = grid.getItem(evt.rowIndex);
@@ -122,38 +135,52 @@ define([
     AdminDocumentViewer.prototype.selectStudent = function (student) {
         this.selectedStudent = student;
         this.banner.classList.remove("d-none");
-        this.banner.innerHTML = '<i class="bi bi-person-check-fill me-2"></i>Selected Student: <strong>' +
-            student.name + '</strong> (' + student.email + ')';
+        this.banner.textContent = "Selected student: " + student.name + " (" + student.email + ")";
 
-        var docs = this.documents.filter(function (d) {
+        this.selectedDocuments = this.documents.filter(function (d) {
             return String(d.ownerEmail || "").toLowerCase() === String(student.email || "").toLowerCase();
         });
-
-        var slot = this.parent.querySelector("#documentGridSlot");
-        slot.innerHTML = "";
         this.detailsArea.innerHTML = "";
+        this.documentSearchWidget.set("value", "");
+        this.documentSearchWidget.set("disabled", false);
+        this.filterDocuments("");
+    };
 
+    AdminDocumentViewer.prototype.filterDocuments = function (term) {
+        var query = String(term || "").toLowerCase().trim();
+        var docs = this.selectedDocuments.filter(function (doc) {
+            return [doc.name, doc.type, doc.currentVersion, doc.ownerEmail]
+                .join(" ").toLowerCase().indexOf(query) >= 0;
+        });
         if (!docs.length) {
-            slot.innerHTML = '<div class="alert alert-warning py-2">No documents uploaded by this student.</div>';
+            var emptySlot = this.parent.querySelector("#documentGridSlot");
+            if (this.documentGrid && !this.documentGrid._destroyed) {
+                this.documentGrid.destroyRecursive();
+            }
+            this.documentGrid = null;
+            emptySlot.innerHTML = '<div class="alert alert-' +
+                (this.selectedDocuments.length ? "light border" : "warning") +
+                ' py-2">' +
+                (this.selectedDocuments.length ? "No documents match your search." : "No documents uploaded by this student.") +
+                '</div>';
             return;
         }
 
-        var store = new Memory({ data: docs, idProperty: "id" });
+        var slot = this.parent.querySelector("#documentGridSlot");
+        if (this.documentGrid && !this.documentGrid._destroyed) {
+            this.documentGrid.destroyRecursive();
+        }
+        this.documentGrid = null;
+        slot.innerHTML = "";
         var self = this;
-        var docGrid = new DataGrid({
-            store: new ObjectStore({ objectStore: store }),
-            structure: [[
+        var docGrid = AdminUi.createGrid(slot, docs, [[
                 { name: "Doc ID", field: "id", width: "12%" },
                 { name: "Document Title", field: "name", width: "38%" },
                 { name: "Document Type", field: "type", width: "25%" },
                 { name: "Latest Version", field: "currentVersion", width: "25%" }
-            ]],
-            autoHeight: true,
-            selectionMode: "single"
-        }, domConstruct.create("div", { style: "height: 170px; width: 100%;" }, slot));
+            ]], { autoHeight: 5, selectionMode: "single" });
 
-        docGrid.startup();
-        this.grids.push(docGrid);
+        this.documentGrid = docGrid;
 
         on(docGrid, "RowClick", function (evt) {
             var item = docGrid.getItem(evt.rowIndex);
@@ -231,22 +258,19 @@ define([
                     };
                 });
 
-                var store = new Memory({ data: formattedAnnotations, idProperty: "id" });
-                var annotGrid = new DataGrid({
-                    store: new ObjectStore({ objectStore: store }),
-                    structure: [[
+                if (self.annotationGrid && !self.annotationGrid._destroyed) {
+                    self.annotationGrid.destroyRecursive();
+                }
+                var annotGrid = AdminUi.createGrid(annotGridSlot, formattedAnnotations, [[
                         { name: "ID", field: "id", width: "8%" },
                         { name: "Type", field: "type", width: "15%" },
                         { name: "Page #", field: "pageNumber", width: "10%" },
                         { name: "Comment", field: "comment", width: "35%" },
                         { name: "Created By", field: "createdBy", width: "17%" },
                         { name: "Created At", field: "createdAt", width: "15%" }
-                    ]],
-                    autoHeight: true
-                }, domConstruct.create("div", { style: "height: 160px; width: 100%;" }, annotGridSlot));
+                    ]], { autoHeight: 5, height: 160 });
 
-                annotGrid.startup();
-                self.grids.push(annotGrid);
+                self.annotationGrid = annotGrid;
             })
             .catch(function (err) {
                 Logger.error("AdminDocumentViewer", "Failed to fetch annotations", err);

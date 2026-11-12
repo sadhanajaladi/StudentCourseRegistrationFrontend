@@ -1,9 +1,263 @@
-/* Modern Bootstrap 5 + Dojo Dijit Harmonization */
+/* Modern Bootstrap 5 */
 body {
     background-color: #f8f9fa;
     color: #212529;
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     min-height: 100vh;
+}
+
+.dashboard-layout {
+    display: grid;
+    grid-template-columns: 250px minmax(0, 1fr);
+    gap: 1.5rem;
+    min-height: calc(100vh - 100px);
+    padding: 1.5rem;
+}
+
+.dashboard-sidebar {
+    align-self: start;
+    background: #fff;
+    border: 1px solid #e8edf3;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    padding: 1.25rem 0.875rem;
+}
+
+.dashboard-admin-profile {
+    align-items: flex-start;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    min-width: 0;
+    padding: 0.25rem 0.25rem 1rem;
+}
+
+.dashboard-admin-avatar {
+    align-items: center;
+    background: #eaf2ff;
+    border-radius: 50%;
+    color: #1d4ed8;
+    display: flex;
+    flex: 0 0 2.5rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    height: 2.5rem;
+    justify-content: center;
+}
+
+.dashboard-admin-details {
+    min-width: 0;
+}
+
+.dashboard-admin-name {
+    color: #1e293b;
+    font-size: 0.9rem;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.dashboard-admin-email {
+    color: #64748b;
+    font-size: 0.75rem;
+    margin: 0.15rem 0 0.4rem;
+    overflow-wrap: anywhere;
+}
+
+.dashboard-admin-role {
+    background: #fff7ed;
+    border-radius: 999px;
+    color: #9a3412;
+    display: inline-block;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    padding: 0.15rem 0.5rem;
+}
+
+.dashboard-tree-root {
+    background: transparent;
+    border: 0;
+    border-radius: 0.375rem;
+    color: #334155;
+    cursor: pointer;
+    display: block;
+    font-weight: 600;
+    text-align: left;
+    padding: 0.6rem 0.5rem;
+    width: 100%;
+}
+
+.dashboard-tree-root:hover,
+.dashboard-tree-root:focus-visible {
+    background: #f1f5f9;
+    color: #1d4ed8;
+}
+
+.dashboard-tree-root[aria-expanded="true"] {
+    background: #f1f5f9;
+}
+
+.dashboard-tree-children {
+    border-left: 1px solid #dbe3ee;
+    margin: 0.25rem 0 0 0.75rem;
+    padding-left: 0.75rem;
+}
+
+.dashboard-tree-children[hidden],
+.dashboard-workspace-header[hidden] {
+    display: none !important;
+}
+
+.dashboard-tree-icon {
+    display: inline-block;
+    margin-right: 0.625rem;
+    text-align: center;
+    width: 1.25rem;
+}
+
+.dashboard-sidebar .nav-link {
+    border-radius: 0.5rem;
+    color: #475569;
+    margin: 0.125rem 0;
+    padding: 0.75rem;
+    text-align: left;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    width: 100%;
+}
+
+.dashboard-sidebar .nav-link:hover {
+    background: #f1f5f9;
+    color: #1d4ed8;
+}
+
+.dashboard-sidebar .nav-link.active {
+    background: #eaf2ff;
+    color: #1d4ed8;
+}
+
+.dashboard-workspace-header {
+    background: #fff;
+    border: 1px solid #e8edf3;
+    border-radius: 0.75rem 0.75rem 0 0;
+    padding: 1rem 1.25rem 0;
+}
+
+.dashboard-workspace-title {
+    align-items: center;
+    display: flex;
+    gap: 0.6rem;
+    margin-bottom: 0.75rem;
+}
+
+.dashboard-workspace-title h3 {
+    font-size: 1.25rem;
+}
+
+.dashboard-workspace-title > span {
+    font-size: 1.25rem;
+}
+
+.dashboard-workspace-tabs {
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    gap: 0.25rem;
+    overflow-x: auto;
+}
+
+.dashboard-workspace-tab {
+    background: transparent;
+    border: 0;
+    border-bottom: 3px solid transparent;
+    color: #475569;
+    flex: 0 0 auto;
+    font: inherit;
+    padding: 0.65rem 0.85rem;
+}
+
+.dashboard-workspace-tab:hover {
+    color: #1d4ed8;
+}
+
+.dashboard-workspace-tab.active {
+    border-bottom-color: #2563eb;
+    color: #1d4ed8;
+    font-weight: 600;
+}
+
+.dashboard-main {
+    min-width: 0;
+    padding: 0.25rem 0;
+}
+
+.dashboard-main .dashboard-content {
+    background: #fff;
+    border: 1px solid #e8edf3;
+    border-top: 0;
+    border-radius: 0 0 0.75rem 0.75rem;
+    padding: 1.25rem;
+}
+
+.dashboard-main .dashboard-content.dashboard-home {
+    align-items: center;
+    border-radius: 0.75rem;
+    display: flex;
+    justify-content: center;
+    min-height: 420px;
+    text-align: center;
+}
+
+.dashboard-welcome {
+    max-width: 560px;
+    padding: 2rem;
+}
+
+.dashboard-welcome-icon {
+    font-size: 3rem;
+    margin-bottom: 0.75rem;
+}
+
+.dashboard-welcome h1 {
+    color: #1e3a8a;
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+}
+
+.dashboard-welcome p {
+    color: #64748b;
+    line-height: 1.7;
+    margin-bottom: 0;
+}
+
+.dashboard-page-heading {
+    border-bottom: 1px solid #e2e8f0;
+    margin-bottom: 1.5rem;
+    padding: 0.25rem 0 1rem;
+}
+
+.dashboard-search-panel {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    max-width: 560px;
+    padding: 0.875rem 1rem;
+}
+
+.admin-document-grid {
+    min-width: 0;
+    overflow-x: auto;
+}
+
+.admin-document-grid .dojoxGrid {
+    max-width: 100%;
+}
+
+.dashboard-content {
+    min-width: 0;
+}
+
+.dashboard-content > * {
+    max-width: 100%;
 }
 
 /* Dojo Grid Enhancements */
@@ -101,4 +355,30 @@ body {
 
 .annotation-overlay:hover .annotation-tooltip {
     display: block;
+}
+
+@media (max-width: 767.98px) {
+    .dashboard-layout {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .dashboard-sidebar {
+        padding: 0.75rem;
+    }
+
+    .dashboard-sidebar .nav {
+        flex-direction: row !important;
+        gap: 0.25rem;
+    }
+
+    .dashboard-sidebar .nav-item {
+        flex: 1 1 auto;
+    }
+
+    .dashboard-sidebar .nav-link {
+        height: 100%;
+        padding: 0.625rem;
+    }
 }

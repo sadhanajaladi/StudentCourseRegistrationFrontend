@@ -1,9 +1,6 @@
 define([
     "dojo/dom-construct",
     "dojo/on",
-    "dojo/store/Memory",
-    "dojo/data/ObjectStore",
-    "dojox/grid/DataGrid",
     "dijit/form/TextBox",
     "dijit/form/ValidationTextBox",
     "dijit/form/NumberTextBox",
@@ -12,10 +9,11 @@ define([
     "dijit/Dialog",
     "app/widgets/ConfirmDialog",
     "app/widgets/AdminDocumentViewer",
+    "app/services/AdminUi",
     "app/services/Api",
     "app/services/Logger",
     "app/services/Properties"
-], function (domConstruct, on, Memory, ObjectStore, DataGrid, TextBox, ValidationTextBox, NumberTextBox, Form, Button, Dialog, ConfirmDialog, AdminDocumentViewer, api, Logger, Properties) {
+], function (domConstruct, on, TextBox, ValidationTextBox, NumberTextBox, Form, Button, Dialog, ConfirmDialog, AdminDocumentViewer, AdminUi, api, Logger, Properties) {
 
     function AdminController(app) {
         this.app = app;
@@ -23,16 +21,17 @@ define([
         this.docViewer = new AdminDocumentViewer();
     }
 
-    // Load Students Tab with DataGrid & ConfirmDialog
+    // Load Students Tab with EnhancedGrid & ConfirmDialog
     AdminController.prototype.loadStudents = function (host) {
         var self = this;
         host.innerHTML = [
             '<div class="card shadow-sm border-0 mb-4">',
-            '<div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">',
-            '<h5 class="card-title fw-bold text-primary mb-0">Registered Students</h5>',
-            '<div style="max-width: 320px; width: 100%;" id="studentSearchSlot"></div>',
-            '</div>',
+            '<div class="card-header bg-white py-3 border-bottom"><h5 class="card-title fw-bold text-primary mb-0">👥 Registered Students</h5></div>',
             '<div class="card-body">',
+            '<div class="dashboard-search-panel mb-3">',
+            '<label class="form-label fw-semibold text-secondary mb-2" for="studentSearchInput"><span aria-hidden="true">🔍</span> Search students</label>',
+            '<div id="studentSearchSlot"></div>',
+            '</div>',
             '<div id="adminStudentsGridContainer" style="height: 360px; width: 100%;"></div>',
             '</div></div>',
             '<div id="studentDetailModalSlot"></div>'
@@ -42,7 +41,7 @@ define([
             placeHolder: "Search by student name or email...",
             intermediateChanges: true,
             style: "width: 100%;"
-        }, domConstruct.create("input", {}, host.querySelector("#studentSearchSlot")));
+        }, domConstruct.create("input", { id: "studentSearchInput", "aria-label": "Search students by name or email" }, host.querySelector("#studentSearchSlot")));
         searchBox.startup();
 
         Logger.info("AdminController", "Loading student records");
@@ -65,20 +64,17 @@ define([
                         createdAt: s.createdAt ? new Date(s.createdAt).toLocaleDateString() : "—"
                     };
                 });
-                var store = new Memory({ data: formatted, idProperty: "id" });
-                var grid = new DataGrid({
-                    store: new ObjectStore({ objectStore: store }),
-                    structure: [[
+                var grid = AdminUi.createGrid(gridSlot, formatted, [[
                         { name: "Student ID", field: "id", width: "12%" },
                         { name: "Full Name", field: "name", width: "28%" },
                         { name: "Email Address", field: "email", width: "35%" },
                         { name: "Registered Date", field: "createdAt", width: "25%" }
-                    ]],
+                    ]], {
+                    height: 340,
                     autoHeight: true,
                     selectionMode: "single"
-                }, domConstruct.create("div", { style: "height: 340px; width: 100%;" }, gridSlot));
+                });
 
-                grid.startup();
                 self.activeGrid = grid;
 
                 on(grid, "RowClick", function (evt) {
@@ -170,16 +166,17 @@ define([
         dialog.show();
     };
 
-    // Load Enrollments Tab with DataGrid & ConfirmDialog
+    // Load Enrollments Tab with EnhancedGrid & ConfirmDialog
     AdminController.prototype.loadEnrollments = function (host) {
         var self = this;
         host.innerHTML = [
             '<div class="card shadow-sm border-0 mb-4">',
-            '<div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">',
-            '<h5 class="card-title fw-bold text-primary mb-0">All Course Enrollments</h5>',
-            '<div style="max-width: 320px; width: 100%;" id="enrollmentSearchSlot"></div>',
-            '</div>',
+            '<div class="card-header bg-white py-3 border-bottom"><h5 class="card-title fw-bold text-primary mb-0">🧾 All Course Enrollments</h5></div>',
             '<div class="card-body">',
+            '<div class="dashboard-search-panel mb-3">',
+            '<label class="form-label fw-semibold text-secondary mb-2" for="enrollmentSearchInput"><span aria-hidden="true">🔍</span> Search enrollments</label>',
+            '<div id="enrollmentSearchSlot"></div>',
+            '</div>',
             '<div id="adminEnrollmentsGridContainer" style="height: 380px; width: 100%;"></div>',
             '</div></div>'
         ].join("");
@@ -188,7 +185,7 @@ define([
             placeHolder: "Filter student, email, or course...",
             intermediateChanges: true,
             style: "width: 100%;"
-        }, domConstruct.create("input", {}, host.querySelector("#enrollmentSearchSlot")));
+        }, domConstruct.create("input", { id: "enrollmentSearchInput", "aria-label": "Search enrollments by student, email, or course" }, host.querySelector("#enrollmentSearchSlot")));
         searchBox.startup();
 
         Logger.info("AdminController", "Loading enrollments");
@@ -217,10 +214,7 @@ define([
                     };
                 });
 
-                var store = new Memory({ data: formatted, idProperty: "id" });
-                var grid = new DataGrid({
-                    store: new ObjectStore({ objectStore: store }),
-                    structure: [[
+                var grid = AdminUi.createGrid(gridSlot, formatted, [[
                         { name: "ID", field: "id", width: "8%" },
                         { name: "Student", field: "student", width: "20%" },
                         { name: "Email", field: "email", width: "22%" },
@@ -228,12 +222,12 @@ define([
                         { name: "Code", field: "code", width: "10%" },
                         { name: "Status", field: "status", width: "10%" },
                         { name: "Progress", field: "progress", width: "18%" }
-                    ]],
+                    ]], {
+                    height: 360,
                     autoHeight: true,
                     selectionMode: "single"
-                }, domConstruct.create("div", { style: "height: 360px; width: 100%;" }, gridSlot));
+                });
 
-                grid.startup();
                 self.activeGrid = grid;
 
                 on(grid, "RowClick", function (evt) {
@@ -280,7 +274,7 @@ define([
         });
     };
 
-    // Load Courses Tab with ValidationForm + DataGrid
+    // Load Courses Tab with ValidationForm + EnhancedGrid
     AdminController.prototype.loadCourses = function (host) {
         var self = this;
         host.innerHTML = [
@@ -296,7 +290,7 @@ define([
             '<div class="col-lg-8">',
             '<div class="card shadow-sm border-0">',
             '<div class="card-header bg-white py-3 border-bottom">',
-            '<h5 class="card-title fw-bold text-primary mb-0">Available Courses</h5>',
+            '<h5 class="card-title fw-bold text-primary mb-0">📚 Available Courses</h5>',
             '</div>',
             '<div class="card-body">',
             '<div id="adminCourseGridSlot" style="height: 380px; width: 100%;"></div>',
@@ -307,9 +301,7 @@ define([
         var formHost = host.querySelector("#adminCourseFormSlot");
         var form = new Form({}, domConstruct.create("div", {}, formHost));
 
-        var titleGroup = domConstruct.create("div", { className: "mb-3" }, form.domNode);
-        domConstruct.create("label", { className: "form-label fw-semibold text-secondary", innerHTML: Properties.get("label.courseTitle", "Course Title") }, titleGroup);
-        var titleInput = new ValidationTextBox({
+        var titleInput = AdminUi.addFormField(form, Properties.get("label.courseTitle", "Course Title"), ValidationTextBox, {
             name: "title",
             required: true,
             trim: true,
@@ -317,12 +309,9 @@ define([
             invalidMessage: Properties.get("val.courseTitle.invalid"),
             placeHolder: "e.g. Advanced Java & Spring Boot",
             style: "width: 100%;"
-        }, domConstruct.create("input", {}, titleGroup));
-        titleInput.startup();
+        }, "mb-3");
 
-        var codeGroup = domConstruct.create("div", { className: "mb-3" }, form.domNode);
-        domConstruct.create("label", { className: "form-label fw-semibold text-secondary", innerHTML: Properties.get("label.courseCode", "Course Code") }, codeGroup);
-        var codeInput = new ValidationTextBox({
+        var codeInput = AdminUi.addFormField(form, Properties.get("label.courseCode", "Course Code"), ValidationTextBox, {
             name: "courseCode",
             required: true,
             trim: true,
@@ -330,29 +319,22 @@ define([
             invalidMessage: Properties.get("val.courseCode.invalid"),
             placeHolder: "e.g. CS101",
             style: "width: 100%;"
-        }, domConstruct.create("input", {}, codeGroup));
-        codeInput.startup();
+        }, "mb-3");
 
-        var creditsGroup = domConstruct.create("div", { className: "mb-3" }, form.domNode);
-        domConstruct.create("label", { className: "form-label fw-semibold text-secondary", innerHTML: Properties.get("label.credits", "Credits") }, creditsGroup);
-        var creditsInput = new NumberTextBox({
+        var creditsInput = AdminUi.addFormField(form, Properties.get("label.credits", "Credits"), NumberTextBox, {
             name: "credits",
             required: true,
             value: 3,
             constraints: { min: 1, max: 20, places: 0 },
             invalidMessage: Properties.get("val.credits.invalid"),
             style: "width: 100%;"
-        }, domConstruct.create("input", {}, creditsGroup));
-        creditsInput.startup();
+        }, "mb-3");
 
-        var descGroup = domConstruct.create("div", { className: "mb-4" }, form.domNode);
-        domConstruct.create("label", { className: "form-label fw-semibold text-secondary", innerHTML: Properties.get("label.description", "Description") }, descGroup);
-        var descInput = new TextBox({
+        var descInput = AdminUi.addFormField(form, Properties.get("label.description", "Description"), TextBox, {
             name: "description",
             placeHolder: "Enter course syllabus and description...",
             style: "width: 100%;"
-        }, domConstruct.create("input", {}, descGroup));
-        descInput.startup();
+        }, "mb-4");
 
         var submitBtn = new Button({
             label: Properties.get("btn.addCourse", "Add Course"),
@@ -401,19 +383,16 @@ define([
                 return;
             }
 
-            var store = new Memory({ data: courses, idProperty: "id" });
-            var grid = new DataGrid({
-                store: new ObjectStore({ objectStore: store }),
-                structure: [[
+            var grid = AdminUi.createGrid(gridSlot, courses, [[
                     { name: "Code", field: "courseCode", width: "15%" },
                     { name: "Title", field: "title", width: "35%" },
                     { name: "Credits", field: "credits", width: "12%" },
                     { name: "Description", field: "description", width: "38%" }
-                ]],
+                ]], {
+                height: 360,
                 autoHeight: true
-            }, domConstruct.create("div", { style: "height: 360px; width: 100%;" }, gridSlot));
+            });
 
-            grid.startup();
             self.activeGrid = grid;
         }).catch(function (err) {
             Logger.error("AdminController", "Failed to load course list", err);

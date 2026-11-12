@@ -3,7 +3,7 @@ define([
     "dojo/on",
     "dojo/store/Memory",
     "dojo/data/ObjectStore",
-    "dojox/grid/DataGrid",
+    "dojox/grid/EnhancedGrid",
     "dijit/form/TextBox",
     "dijit/form/Select",
     "dijit/form/Button",
@@ -12,7 +12,7 @@ define([
     "app/services/Api",
     "app/services/Logger",
     "app/services/Properties"
-], function (domConstruct, on, Memory, ObjectStore, DataGrid, TextBox, Select, Button, Dialog, DocumentManagement, api, Logger, Properties) {
+], function (domConstruct, on, Memory, ObjectStore, EnhancedGrid, TextBox, Select, Button, Dialog, DocumentManagement, api, Logger, Properties) {
 
     function StudentController(app) {
         this.app = app;
@@ -21,16 +21,17 @@ define([
         this.docManagement = new DocumentManagement();
     }
 
-    // Available Courses Tab with DataGrid
+    // Available Courses Tab with EnhancedGrid
     StudentController.prototype.loadAvailableCourses = function (host) {
         var self = this;
         host.innerHTML = [
             '<div class="card shadow-sm border-0 mb-4">',
-            '<div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">',
-            '<h5 class="card-title fw-bold text-primary mb-0">Explore & Enroll in Courses</h5>',
-            '<div style="max-width: 320px; width: 100%;" id="studentCourseSearchSlot"></div>',
-            '</div>',
+            '<div class="card-header bg-white py-3 border-bottom"><h5 class="card-title fw-bold text-primary mb-0">📚 Explore & Enroll in Courses</h5></div>',
             '<div class="card-body">',
+            '<div class="dashboard-search-panel mb-3">',
+            '<label class="form-label fw-semibold text-secondary mb-2" for="studentCourseSearchInput"><span aria-hidden="true">🔍</span> Search courses</label>',
+            '<div id="studentCourseSearchSlot"></div>',
+            '</div>',
             '<div id="studentCourseGridContainer" style="height: 380px; width: 100%;"></div>',
             '</div></div>'
         ].join("");
@@ -39,7 +40,7 @@ define([
             placeHolder: "Search courses by code or title...",
             intermediateChanges: true,
             style: "width: 100%;"
-        }, domConstruct.create("input", {}, host.querySelector("#studentCourseSearchSlot")));
+        }, domConstruct.create("input", { id: "studentCourseSearchInput", "aria-label": "Search courses by code, title, or description" }, host.querySelector("#studentCourseSearchSlot")));
         searchBox.startup();
 
         Logger.info("StudentController", "Loading courses and student enrollments");
@@ -72,7 +73,7 @@ define([
                 });
 
                 var store = new Memory({ data: formatted, idProperty: "id" });
-                var grid = new DataGrid({
+                var grid = new EnhancedGrid({
                     store: new ObjectStore({ objectStore: store }),
                     structure: [[
                         { name: "Course Code", field: "courseCode", width: "15%" },
@@ -165,7 +166,7 @@ define([
         dialog.show();
     };
 
-    // My Enrollments Tab with DataGrid & Progress Update
+    // My Enrollments Tab with EnhancedGrid & Progress Update
     StudentController.prototype.loadMyEnrollments = function (host) {
         var self = this;
         host.innerHTML = [
@@ -202,7 +203,7 @@ define([
             });
 
             var store = new Memory({ data: formatted, idProperty: "id" });
-            var grid = new DataGrid({
+            var grid = new EnhancedGrid({
                 store: new ObjectStore({ objectStore: store }),
                 structure: [[
                     { name: "Course Code", field: "code", width: "18%" },
